@@ -88,3 +88,6 @@ const WeatherCard: React.FC<WeatherCardProps> = ({ forecast, compact = false }) 
       </div>
     </div>
   );
+};
+
+export default WeatherCard;
