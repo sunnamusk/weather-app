@@ -15,16 +15,28 @@ export const useWeather = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<WeatherError | null>(null);
 
+  const normalizeForecastData = (rawList: any[]) =>
+    rawList.map((entry: any) => ({
+      dt_txt: entry.dt_txt,
+      main: entry.main,
+      wind: entry.wind,
+      weather: {
+        main: entry.weather[0]?.main || '',
+        description: entry.weather[0]?.description || '',
+        icon: entry.weather[0]?.icon || '', //  critical for icons
+      },
+    }));
+
   const searchCity = async (city: string) => {
     try {
       setLoading(true);
       setError(null);
 
       const weatherData = await getCurrentWeather(city);
-      const forecastData = await getForecast(city); //  Add this
+      const forecastData = await getForecast(city);
 
       setCurrentWeather(weatherData);
-      setForecast(forecastData.list); // forecast is usually in `.list` from OpenWeatherMap
+      setForecast(normalizeForecastData(forecastData.list));
     } catch (err) {
       setError({ message: 'Failed to fetch weather data' });
     } finally {
@@ -40,10 +52,9 @@ export const useWeather = () => {
       const weatherData = await getWeatherByCoordinates(lat, lon);
       setCurrentWeather(weatherData);
 
-      // Optionally fetch forecast too
       const city = weatherData.name;
       const forecastData = await getForecast(city);
-      setForecast(forecastData.list);
+      setForecast(normalizeForecastData(forecastData.list));
     } catch (err) {
       setError({ message: 'Failed to fetch location-based weather' });
     } finally {

@@ -23,7 +23,14 @@ const formatTime = (str: string) =>
 const WeatherCard: React.FC<WeatherCardProps> = ({ forecast, compact = false }) => {
   const gradientClass = getWeatherGradientClass(forecast.weather.main, forecast.dt_txt);
 
-  const iconUrl = getWeatherIconUrl(forecast.weather.icon);
+  const iconCode = forecast.weather.icon;
+  const iconUrl = iconCode
+    ? getWeatherIconUrl(iconCode)
+    : 'https://openweathermap.org/img/wn/01d@2x.png'; // fallback icon
+
+  if (!iconCode) {
+    console.warn('Missing icon code for forecast:', forecast);
+  }
 
   if (compact) {
     return (
@@ -33,7 +40,7 @@ const WeatherCard: React.FC<WeatherCardProps> = ({ forecast, compact = false }) 
           <div className="flex justify-center my-2">
             <img
               src={iconUrl}
-              alt={forecast.weather.description}
+              alt={forecast.weather.description || 'weather icon'}
               className="w-12 h-12"
             />
           </div>
@@ -57,7 +64,7 @@ const WeatherCard: React.FC<WeatherCardProps> = ({ forecast, compact = false }) 
           <div className="flex items-center mx-auto md:mx-0">
             <img
               src={iconUrl}
-              alt={forecast.weather.description}
+              alt={forecast.weather.description || 'weather icon'}
               className="w-16 h-16"
             />
             <div className="ml-4 text-center">
