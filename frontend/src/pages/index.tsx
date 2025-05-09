@@ -1,18 +1,28 @@
 import { NextPage } from 'next';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
+
+// Use default imports (ensure each component is exported as `export default`)
 import CurrentWeather from '../components/weather/CurrentWeather';
 import ForecastWeather from '../components/weather/ForecastWeather';
 import SearchBar from '../components/weather/SearchBar';
 import WeatherDetails from '../components/weather/WeatherDetails';
+
 import { useWeather } from '../hooks/useWeather';
 
 const Home: NextPage = () => {
-  const { currentWeather, forecast, loading, error, searchCity, searchByCoordinates } = useWeather();
+  const {
+    currentWeather,
+    forecast,
+    loading,
+    error,
+    searchCity,
+    searchByCoordinates
+  } = useWeather();
+
   const [initialLoad, setInitialLoad] = useState(true);
 
   useEffect(() => {
-    // Try to load weather for a default city on initial load
     if (initialLoad) {
       searchCity('London');
       setInitialLoad(false);
@@ -31,17 +41,19 @@ const Home: NextPage = () => {
           searchByCoordinates(latitude, longitude);
         },
         (error) => {
-          console.error('Error getting location:', error);
-          // Fallback to a default city if geolocation fails
+          console.error('Geolocation error:', error);
           searchCity('London');
         }
       );
     } else {
-      console.error('Geolocation is not supported by this browser.');
-      // Fallback to a default city if geolocation is not supported
+      console.warn('Geolocation not supported');
       searchCity('London');
     }
   };
+
+  //  Debug logs to help trace rendering
+  console.log("RENDER: currentWeather =", currentWeather);
+  console.log("RENDER: forecast =", forecast);
 
   return (
     <>
@@ -65,16 +77,16 @@ const Home: NextPage = () => {
         {error && (
           <div className="alert alert-error mb-8">
             <div className="flex-1">
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                fill="none" 
-                viewBox="0 0 24 24" 
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
                 className="w-6 h-6 mx-2 stroke-current"
               >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth="2" 
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
                 ></path>
               </svg>
@@ -91,8 +103,8 @@ const Home: NextPage = () => {
 
         {!loading && currentWeather && (
           <div>
-            <CurrentWeather weatherData={currentWeather} />
-            <WeatherDetails weatherData={currentWeather} />
+            {currentWeather && <CurrentWeather weatherData={currentWeather} />}
+            {currentWeather && <WeatherDetails weatherData={currentWeather} />}
           </div>
         )}
 
